@@ -1,0 +1,212 @@
+---
+title: "The Effectiveness of Biden's American Rescue Plan: A Multiple Linear Regression Analysis"
+author: "Yiran Mei"
+date: "02/04/2022"
+output: pdf_document
+abstract: "COVID-19 has dominated people's daily lives across the globe since its emergence at the beginning of 2020. In order to combat the adverse effects of the recession on the United States economy, President Biden announced and signed the American Rescue Plan (ARP) to stimulate the market. The purpose of this study is to investigate the impact of the plan's implementation on a number of economic indicators such as the unemployment rate and inflation rate using a multiple regression model. Additionally, statistical techniques such as regression analysis, correlation analysis, and ANOVA are applied to analyze the regression model's results. We estimate that the ARP has no statistical significance with respect to these economic indicators based on our regression model. Statistical analysis of data and evaluation of statistical results will be conducted using the R statistical programming language, version 4.1.2."
+thanks: 'Code and data are available at: https://github.com/YiranMei/Final-Paper-American-Rescue-Plan.'
+bibliography: ref_list.bib
+ 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("kableExtra")
+#install.packages("ggplot2")
+#install.packages("gtsummary")
+#install.packages("openxlsx")
+#install.packages("jtools")
+#install.packages("MASS")
+#install.packages("car")
+
+
+library(kableExtra)
+library(ggplot2)
+library(gtsummary)
+library(openxlsx)
+library(jtools)
+library(MASS)
+library(car)
+
+
+```
+
+# 1.Introduction
+Since 2020, the outbreak of COVID-19 has adversely affected people's daily lives and the global economy. More than 235 000 cases of infection have occurred in the United States in less than two months since the first case was discovered in Washington on January 20, 2020. As of March 17, the outbreak had spread all over the country, including Washington, New York, and California. The number of COVID-19-related deaths in the United States has exceeded 5000 as of April 2020(@update). On December 31, 2020, there were more than 20 million infections and more than 346 thousand deaths within the United States, as well as 83,832,334 confirmed cases and 1,824,590 confirmed deaths worldwide(4). Apart from the COVID-19 pandemic, the related economic crisis in the United States has had a detrimental effect on the economic and health well-being of millions of American workers. Over 9.5 million jobs have been lost as a result of COVID-19, with 4 million workers out of work for at least six months(@ARPs).
+
+Consequently, in order to stimulate and recover the economy from the foreseeable recession, Biden and the government announced the American Rescue Plan (ARP) on March 11, 2021, under which approximately $1 trillion in total would be allocated directly to the American people(@ARPs). Along with extending PUA (Pandemic Unemployment Assistance) through September 6, 2006(@ARPl), each worker can receive a lump-sum payment of $1400 and weekly benefits of $300. A number of provisions were included in the proposed plan, including an extension of unemployment compensation, an increase in the Child Tax Credit, funding for state and local governments, and a subsidy for extra medical expenses resulting from COVID-19(@benefit). At this point of reopening and reflecting on the past two years, an examination of the effectiveness of the ARP becomes necessary to assess whether it has boosted the economy.
+
+In light of the foregoing, we conducted this study to investigate whether there is a statistically significant correlation between the growth of the U.S. economy in various aspects and the implementation of ARP using a number of economic indicators from the Federal Reserve Economic Data. We examine the association in this report using a multiple regression model that incorporates covariates such as unemployment rate, real Gross Domestic Product(GDP), population, 10-year breakeven inflation rate, federal funds effective rate, average hourly earnings, as well as civilian labour force level and a dummy variable reflecting the status of before and after the implementation of the ARP. It has been shown that there is no statistical significance in the association between real GDP and the implementation of the ARP, which suggests the policy has been ineffective. 
+ 
+Three sections are comprised in the remainder of this paper: a data section in which the data is analyzed, a result section that summarizes and explains the results, and a discussion section in which the limitations and implications are explored. The findings of this report will provide stakeholders with an insight into how to evaluate ARP policies and make better plans by taking into account findings.
+To analyze the data in this report, the R statistical programming language(@R) will be applied. Moreover, the following packages must be installed in R for cleaning and analysis processes: openxlsx(@openxlsx), ggplot2(@ggplot2),kableExtra(@kableExtra), gtsummary(@gtsummary).
+
+
+# 2. Data
+
+## 2.1 Data Source
+
+
+## 2.2 Survey methodology
+
+
+## 2.3 Data Characteristics
+
+
+# 3. Discussion and Results
+
+
+## 3.1 Results
+
+
+
+## 3.2 Discussion
+
+### 3.2.1 General Findings
+
+
+
+
+### 3.2.2 Implications
+### 3.2.3 Ethics and biases
+
+# Appendix
+
+
+```{r, echo=FALSE}
+df <- read.xlsx("/Users/winifredmei/Desktop/fredgraph.xlsx", detectDates = TRUE)
+df <- df[-c(0:13), ]
+colnames(df) <- df[1,]
+df <- df[-1, ]
+```
+
+
+```{r, include=FALSE}
+#change the name of complex variables
+names(df)[names(df) == "CES0500000003"] <- "avg_earning"
+names(df)[names(df) == "CLF16OV"] <- "workforce"
+
+#change the format of variables
+df$UNRATE = as.numeric(as.character(df$UNRATE))
+df$GDPC1 = as.numeric(as.character(df$GDPC1))
+df$POPTHM = as.numeric(as.character(df$POPTHM))
+df$T10YIE = as.numeric(as.character(df$T10YIE))
+df$FEDFUNDS = as.numeric(as.character(df$FEDFUNDS))
+df$avg_earning = as.numeric(as.character(df$avg_earning))
+df$workforce = as.numeric(as.character(df$workforce))
+
+#add dummy variable of ARP
+ARP <- c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1)
+df <- cbind(df, ARP)
+
+```
+
+```{r, include=FALSE}
+
+#change the date variable to interval collapsed on the implementation of ARP
+names(df)[names(df) == "observation_date"] <- "quarter_interval"
+
+df["quarter_interval"][df["quarter_interval"] == "2017-01-01"] <- "-15"
+df["quarter_interval"][df["quarter_interval"] == "2017-04-01"] <- "-14"
+df["quarter_interval"][df["quarter_interval"] == "2017-07-01"] <- "-13"
+df["quarter_interval"][df["quarter_interval"] == "2017-10-01"] <- "-13"
+df["quarter_interval"][df["quarter_interval"] == "2018-01-01"] <- "-12"
+df["quarter_interval"][df["quarter_interval"] == "2018-04-01"] <- "-11"
+df["quarter_interval"][df["quarter_interval"] == "2018-07-01"] <- "-10"
+df["quarter_interval"][df["quarter_interval"] == "2018-10-01"] <- "-9"
+df["quarter_interval"][df["quarter_interval"] == "2019-01-01"] <- "-8"
+df["quarter_interval"][df["quarter_interval"] == "2019-04-01"] <- "-7"
+df["quarter_interval"][df["quarter_interval"] == "2019-07-01"] <- "-6"
+df["quarter_interval"][df["quarter_interval"] == "2019-10-01"] <- "-5"
+df["quarter_interval"][df["quarter_interval"] == "2020-01-01"] <- "-4"
+df["quarter_interval"][df["quarter_interval"] == "2020-04-01"] <- "-3"
+df["quarter_interval"][df["quarter_interval"] == "2020-07-01"] <- "-2"
+df["quarter_interval"][df["quarter_interval"] == "2020-10-01"] <- "-1"
+df["quarter_interval"][df["quarter_interval"] == "2021-01-01"] <- "0"
+df["quarter_interval"][df["quarter_interval"] == "2021-04-01"] <- "1"
+df["quarter_interval"][df["quarter_interval"] == "2021-07-01"] <- "2"
+df["quarter_interval"][df["quarter_interval"] == "2021-10-01"] <- "3"
+
+#change the format of variable
+df$quarter_interval = as.numeric(as.character(df$quarter_interval))
+```
+
+```{r, echo=FALSE}
+#show a numeric summary of the data
+s = summary(df)
+s %>%
+  kbl() %>%
+  kable_material(c("striped", "hover"),font_size = 5)
+```
+
+```{r, echo=FALSE}
+#present the unemployment rate in US during the period
+ggplot(df, aes(x = quarter_interval, y = UNRATE, group = 1)) +
+  geom_point(shape=21, color="black", fill="#69b3a2", size=2) +
+  geom_line( color="grey") +
+  geom_vline(xintercept = 1, linetype="dotted", 
+                color = "green", size=1.5)+
+  geom_label(label = df$UNRATE, size=2)+
+  labs(x = "Time Interval(in quarter)", y = "Unemployment rate(%)", 
+       title = "Unemployment rate in US")
+```
+
+```{r, echo=FALSE}
+#draw the simple linear regression line
+ggplot(df,aes(y=UNRATE,x=quarter_interval))+geom_point()+geom_smooth(formula = y ~ x, method = "lm") 
+```
+
+
+```{r, echo=FALSE}
+#check for the independence of observations
+res <- cor(df)
+t <- round(res, 2)
+t %>%
+  kbl(caption = "Correlation Matrix of Variables") %>%
+  kable_classic(full_width = F, html_font = "Cambria",font_size = 8)
+```
+```{r, echo=FALSE}
+#check for normality of dependent variable
+hist(df$UNRATE)
+```
+\newpage
+
+```{r, echo=FALSE}
+#check for linearity of variables
+plot(df$UNRATE ~ ARP + GDPC1 + POPTHM + T10YIE + FEDFUNDS + avg_earning + 
+                 workforce, data=df)
+```
+
+```{r, echo=FALSE}
+#build the multiple regression model
+multi.fit = lm(UNRATE ~ quarter_interval + ARP + GDPC1 + POPTHM + T10YIE + FEDFUNDS + avg_earning + 
+                 workforce   , data=df)
+summ(multi.fit)
+```
+```{r, echo=FALSE}
+#check for variables added
+avPlots(multi.fit)
+```
+
+```{r, echo=FALSE}
+#check for homoscedasticity
+plot(multi.fit)
+```
+```{r, include=FALSE}
+step = stepAIC(multi.fit, direction = "both")
+step$anova 
+```
+
+
+```{r, echo=FALSE}
+#test for the model selected by stepAIC
+multi.fit1 <- lm(UNRATE ~ GDPC1 + POPTHM + workforce, data=df)
+summ(multi.fit1)
+```
+
+
+
+
+# Reference
+
+
