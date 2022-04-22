@@ -4,9 +4,9 @@ author: "Yiran Mei"
 date: "02/04/2022"
 output: pdf_document
 abstract: "COVID-19 has dominated people's daily lives across the globe since its emergence at the beginning of 2020. In order to combat the adverse effects of the recession on the United States economy, President Biden announced and signed the American Rescue Plan (ARP) to stimulate the market. The purpose of this study is to investigate the impact of the plan's implementation on a number of economic indicators such as the unemployment rate and inflation rate using a multiple regression model. Additionally, statistical techniques such as regression analysis, correlation analysis, and ANOVA are applied to analyze the regression model's results. We estimate that the ARP has no statistical significance with respect to these economic indicators based on our regression model. Statistical analysis of data and evaluation of statistical results will be conducted using the R statistical programming language, version 4.1.2."
-thanks: 'Code and data are available at: https://github.com/YiranMei/Final-Paper-American-Rescue-Plan.'
+thanks: 'Code and data are available at: https://github.com/YiranMei/American-Rescue-Plan.'
 bibliography: ref_list.bib
- 
+toc: TRUE
 ---
 
 ```{r setup, include=FALSE}
