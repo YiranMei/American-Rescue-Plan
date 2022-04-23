@@ -39,12 +39,6 @@ In light of the foregoing, we conducted this study to investigate whether there 
 Three sections are comprised in the remainder of this paper: a data section in which the data is analyzed, a result section that summarizes and explains the results, and a discussion section in which the limitations and implications are explored. The findings of this report will provide stakeholders with an insight into how to evaluate ARP policies and make better plans by taking into account findings.
 To analyze the data in this report, the R statistical programming language(@R) will be applied. Moreover, the following packages must be installed in R for cleaning and analysis processes: openxlsx(@openxlsx), ggplot2(@ggplot2),kableExtra(@kableExtra), gtsummary(@gtsummary), jtools(@jtools), MASS(@MASS) and car(@car).
 
-
-
-
-
-
-
 \newpage
 
 # 2. Data
@@ -107,17 +101,7 @@ df["quarter_interval"][df["quarter_interval"] == "2021-10-01"] <- "3"
 df$quarter_interval = as.numeric(as.character(df$quarter_interval))
 ```
 
-\newpage
 ## 2.2 Data Characteristics
-
-```{r, echo=FALSE}
-#show a numeric summary of the data
-s = summary(df)
-s %>%
-  kbl(caption = "Summary of Data") %>%
-  kable_material(c("striped", "hover"),font_size = 6) %>%
-  kable_styling(latex_options = "HOLD_position")
-```
 
 
 ```{r,fig.cap="Unemployment rate in US", echo=FALSE}
@@ -133,6 +117,16 @@ ggplot(df, aes(x = quarter_interval, y = UNRATE, group = 1)) +
 ```
 
 
+```{r, echo=FALSE}
+#show a numeric summary of the data
+s = summary(df)
+s %>%
+  kbl(caption = "Summary of Data") %>%
+  kable_classic_2(full_width = F ,font_size = 4) %>%
+  kable_styling(latex_options = "HOLD_position")
+```
+
+\newpage
 # 3. Model Development
 
 ```{r, fig.cap="Simple Linear Regression",echo=FALSE}
@@ -151,10 +145,7 @@ t %>%
   kable_styling(latex_options = "HOLD_position")
 ```
 
-```{r, fig.cap="Normality of Unemployment Rate",echo=FALSE}
-#check for normality of dependent variable
-hist(df$UNRATE)
-```
+
 \newpage
 
 
@@ -205,6 +196,10 @@ summ(multi.fit1)
 
 \newpage
 # Appendix
+```{r, fig.cap="Normality of Unemployment Rate",echo=FALSE}
+#check for normality of dependent variable
+hist(df$UNRATE)
+```
 
 ```{r q,fig.cap="Linearity Test for Covariates", echo=FALSE}
 #check for linearity of variables
