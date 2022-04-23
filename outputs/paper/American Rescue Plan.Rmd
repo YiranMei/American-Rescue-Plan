@@ -27,8 +27,6 @@ library(openxlsx)
 library(jtools)
 library(MASS)
 library(car)
-
-
 ```
 
 # 1.Introduction
@@ -39,40 +37,19 @@ Consequently, in order to stimulate and recover the economy from the foreseeable
 In light of the foregoing, we conducted this study to investigate whether there is a statistically significant correlation between the growth of the U.S. economy in various aspects and the implementation of ARP using a number of economic indicators from the Federal Reserve Economic Data. We examine the association in this report using a multiple regression model that incorporates covariates such as unemployment rate, real Gross Domestic Product(GDP), population, 10-year breakeven inflation rate, federal funds effective rate, average hourly earnings, as well as civilian labour force level and a dummy variable reflecting the status of before and after the implementation of the ARP. It has been shown that there is no statistical significance in the association between real GDP and the implementation of the ARP, which suggests the policy has been ineffective. 
  
 Three sections are comprised in the remainder of this paper: a data section in which the data is analyzed, a result section that summarizes and explains the results, and a discussion section in which the limitations and implications are explored. The findings of this report will provide stakeholders with an insight into how to evaluate ARP policies and make better plans by taking into account findings.
-To analyze the data in this report, the R statistical programming language(@R) will be applied. Moreover, the following packages must be installed in R for cleaning and analysis processes: openxlsx(@openxlsx), ggplot2(@ggplot2),kableExtra(@kableExtra), gtsummary(@gtsummary).
+To analyze the data in this report, the R statistical programming language(@R) will be applied. Moreover, the following packages must be installed in R for cleaning and analysis processes: openxlsx(@openxlsx), ggplot2(@ggplot2),kableExtra(@kableExtra), gtsummary(@gtsummary), jtools(@jtools), MASS(@MASS) and car(@car).
 
+
+
+
+
+
+
+\newpage
 
 # 2. Data
 
 ## 2.1 Data Source
-
-
-## 2.2 Survey methodology
-
-
-## 2.3 Data Characteristics
-
-
-# 3. Discussion and Results
-
-
-## 3.1 Results
-
-
-
-## 3.2 Discussion
-
-### 3.2.1 General Findings
-
-
-
-
-### 3.2.2 Implications
-### 3.2.3 Ethics and biases
-
-# Appendix
-
-
 ```{r, echo=FALSE}
 df <- read.xlsx("/Users/winifredmei/Desktop/fredgraph.xlsx", detectDates = TRUE)
 df <- df[-c(0:13), ]
@@ -98,7 +75,6 @@ df$workforce = as.numeric(as.character(df$workforce))
 #add dummy variable of ARP
 ARP <- c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1)
 df <- cbind(df, ARP)
-
 ```
 
 ```{r, include=FALSE}
@@ -131,15 +107,20 @@ df["quarter_interval"][df["quarter_interval"] == "2021-10-01"] <- "3"
 df$quarter_interval = as.numeric(as.character(df$quarter_interval))
 ```
 
+\newpage
+## 2.2 Data Characteristics
+
 ```{r, echo=FALSE}
 #show a numeric summary of the data
 s = summary(df)
 s %>%
-  kbl() %>%
-  kable_material(c("striped", "hover"),font_size = 5)
+  kbl(caption = "Summary of Data") %>%
+  kable_material(c("striped", "hover"),font_size = 6) %>%
+  kable_styling(latex_options = "HOLD_position")
 ```
 
-```{r, echo=FALSE}
+
+```{r,fig.cap="Unemployment rate in US", echo=FALSE}
 #present the unemployment rate in US during the period
 ggplot(df, aes(x = quarter_interval, y = UNRATE, group = 1)) +
   geom_point(shape=21, color="black", fill="#69b3a2", size=2) +
@@ -151,7 +132,10 @@ ggplot(df, aes(x = quarter_interval, y = UNRATE, group = 1)) +
        title = "Unemployment rate in US")
 ```
 
-```{r, echo=FALSE}
+
+# 3. Model Development
+
+```{r, fig.cap="Simple Linear Regression",echo=FALSE}
 #draw the simple linear regression line
 ggplot(df,aes(y=UNRATE,x=quarter_interval))+geom_point()+geom_smooth(formula = y ~ x, method = "lm") 
 ```
@@ -163,35 +147,32 @@ res <- cor(df)
 t <- round(res, 2)
 t %>%
   kbl(caption = "Correlation Matrix of Variables") %>%
-  kable_classic(full_width = F, html_font = "Cambria",font_size = 8)
+  kable_classic(full_width = F, html_font = "Cambria",font_size = 8) %>%
+  kable_styling(latex_options = "HOLD_position")
 ```
-```{r, echo=FALSE}
+
+```{r, fig.cap="Normality of Unemployment Rate",echo=FALSE}
 #check for normality of dependent variable
 hist(df$UNRATE)
 ```
 \newpage
 
-```{r, echo=FALSE}
-#check for linearity of variables
-plot(df$UNRATE ~ ARP + GDPC1 + POPTHM + T10YIE + FEDFUNDS + avg_earning + 
-                 workforce, data=df)
-```
 
-```{r, echo=FALSE}
+
+```{r,fig.cap="Original Multiple Regression Model", echo=FALSE}
 #build the multiple regression model
 multi.fit = lm(UNRATE ~ quarter_interval + ARP + GDPC1 + POPTHM + T10YIE + FEDFUNDS + avg_earning + 
                  workforce   , data=df)
 summ(multi.fit)
 ```
-```{r, echo=FALSE}
+
+```{r, fig.cap="Added-Variable Plots",echo=FALSE}
 #check for variables added
 avPlots(multi.fit)
 ```
 
-```{r, echo=FALSE}
-#check for homoscedasticity
-plot(multi.fit)
-```
+
+
 ```{r, include=FALSE}
 step = stepAIC(multi.fit, direction = "both")
 step$anova 
@@ -206,7 +187,43 @@ summ(multi.fit1)
 
 
 
+# 4. Discussion and Results
+
+
+## 4.1 Results
+
+
+
+## 4.2 Discussion
+
+### 4.2.1 General Findings
+
+
+### 4.2.2 Implications
+### 4.2.3 Ethics and biases
+
+
+\newpage
+# Appendix
+
+```{r q,fig.cap="Linearity Test for Covariates", echo=FALSE}
+#check for linearity of variables
+plot(df$UNRATE ~ ARP + GDPC1 + POPTHM + T10YIE + FEDFUNDS + avg_earning + 
+                 workforce, data=df)
+```
+
+```{r, fig.cap="Homoscedasticity Tests",echo=FALSE}
+#check for homoscedasticity
+plot(multi.fit)
+```
+
+\newpage
 
 # Reference
+
+
+
+
+
 
 
