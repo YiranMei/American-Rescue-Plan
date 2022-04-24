@@ -18,8 +18,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #install.packages("jtools")
 #install.packages("MASS")
 #install.packages("car")
-
-
+#install.packages("modelsummary")
 library(kableExtra)
 library(ggplot2)
 library(gtsummary)
@@ -27,6 +26,7 @@ library(openxlsx)
 library(jtools)
 library(MASS)
 library(car)
+library(modelsummary)
 ```
 
 # 1.Introduction
@@ -46,8 +46,8 @@ To analyze the data in this report, the R statistical programming language(@R) w
 
 ## 2.1 Data Source
 ```{r, echo=FALSE}
-df <- read.xlsx("/Users/winifredmei/Desktop/fredgraph.xlsx", detectDates = TRUE)
-df <- df[-c(0:13), ]
+df <- read.xlsx("/Users/winifredmei/Desktop/fredgraph.xlsx")
+df <- df[-c(0:12), ]
 colnames(df) <- df[1,]
 df <- df[-1, ]
 ```
@@ -55,20 +55,22 @@ df <- df[-1, ]
 
 ```{r, include=FALSE}
 #change the name of complex variables
-names(df)[names(df) == "CES0500000003"] <- "avg_earning"
-names(df)[names(df) == "CLF16OV"] <- "workforce"
+names(df)[names(df) == "UNRATE"] <- "UnemploymentRate"
+names(df)[names(df) == "POPTHM"] <- "Population"
+names(df)[names(df) == "T10YIE"] <- "InflationRate"
+names(df)[names(df) == "EFFR"] <- "InterestRate"
+names(df)[names(df) == "CLF16OV"] <- "Laborforce"
+names(df)[names(df) == "CES0500000003"] <- "Wage"
 
-#change the format of variables
-df$UNRATE = as.numeric(as.character(df$UNRATE))
-df$GDPC1 = as.numeric(as.character(df$GDPC1))
-df$POPTHM = as.numeric(as.character(df$POPTHM))
-df$T10YIE = as.numeric(as.character(df$T10YIE))
-df$FEDFUNDS = as.numeric(as.character(df$FEDFUNDS))
-df$avg_earning = as.numeric(as.character(df$avg_earning))
-df$workforce = as.numeric(as.character(df$workforce))
+df$UnemploymentRate = as.numeric(as.character(df$UnemploymentRate))
+df$Population = as.numeric(as.character(df$Population))
+df$InflationRate = as.numeric(as.character(df$InflationRate))
+df$InterestRate = as.numeric(as.character(df$InterestRate))
+df$Wage = as.numeric(as.character(df$Wage))
+df$Laborforce = as.numeric(as.character(df$Laborforce))
 
 #add dummy variable of ARP
-ARP <- c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1)
+ARP <- c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1)
 df <- cbind(df, ARP)
 ```
 
@@ -77,26 +79,33 @@ df <- cbind(df, ARP)
 #change the date variable to interval collapsed on the implementation of ARP
 names(df)[names(df) == "observation_date"] <- "quarter_interval"
 
-df["quarter_interval"][df["quarter_interval"] == "2017-01-01"] <- "-15"
-df["quarter_interval"][df["quarter_interval"] == "2017-04-01"] <- "-14"
-df["quarter_interval"][df["quarter_interval"] == "2017-07-01"] <- "-13"
-df["quarter_interval"][df["quarter_interval"] == "2017-10-01"] <- "-13"
-df["quarter_interval"][df["quarter_interval"] == "2018-01-01"] <- "-12"
-df["quarter_interval"][df["quarter_interval"] == "2018-04-01"] <- "-11"
-df["quarter_interval"][df["quarter_interval"] == "2018-07-01"] <- "-10"
-df["quarter_interval"][df["quarter_interval"] == "2018-10-01"] <- "-9"
-df["quarter_interval"][df["quarter_interval"] == "2019-01-01"] <- "-8"
-df["quarter_interval"][df["quarter_interval"] == "2019-04-01"] <- "-7"
-df["quarter_interval"][df["quarter_interval"] == "2019-07-01"] <- "-6"
-df["quarter_interval"][df["quarter_interval"] == "2019-10-01"] <- "-5"
-df["quarter_interval"][df["quarter_interval"] == "2020-01-01"] <- "-4"
-df["quarter_interval"][df["quarter_interval"] == "2020-04-01"] <- "-3"
-df["quarter_interval"][df["quarter_interval"] == "2020-07-01"] <- "-2"
-df["quarter_interval"][df["quarter_interval"] == "2020-10-01"] <- "-1"
-df["quarter_interval"][df["quarter_interval"] == "2021-01-01"] <- "0"
+df["quarter_interval"][df["quarter_interval"] == "2020-01-01"] <- "-14"
+df["quarter_interval"][df["quarter_interval"] == "2020-02-01"] <- "-13"
+df["quarter_interval"][df["quarter_interval"] == "2020-03-01"] <- "-12"
+df["quarter_interval"][df["quarter_interval"] == "2020-04-01"] <- "-11"
+df["quarter_interval"][df["quarter_interval"] == "2020-05-01"] <- "-10"
+df["quarter_interval"][df["quarter_interval"] == "2020-06-01"] <- "-9"
+df["quarter_interval"][df["quarter_interval"] == "2020-07-01"] <- "-8"
+df["quarter_interval"][df["quarter_interval"] == "2020-08-01"] <- "-7"
+df["quarter_interval"][df["quarter_interval"] == "2020-09-01"] <- "-6"
+df["quarter_interval"][df["quarter_interval"] == "2020-10-01"] <- "-5"
+df["quarter_interval"][df["quarter_interval"] == "2020-11-01"] <- "-4"
+df["quarter_interval"][df["quarter_interval"] == "2020-12-01"] <- "-3"
+df["quarter_interval"][df["quarter_interval"] == "2021-01-01"] <- "-2"
+df["quarter_interval"][df["quarter_interval"] == "2021-02-01"] <- "-1"
+df["quarter_interval"][df["quarter_interval"] == "2021-03-01"] <- "0"
 df["quarter_interval"][df["quarter_interval"] == "2021-04-01"] <- "1"
-df["quarter_interval"][df["quarter_interval"] == "2021-07-01"] <- "2"
-df["quarter_interval"][df["quarter_interval"] == "2021-10-01"] <- "3"
+df["quarter_interval"][df["quarter_interval"] == "2021-05-01"] <- "2"
+df["quarter_interval"][df["quarter_interval"] == "2021-06-01"] <- "3"
+df["quarter_interval"][df["quarter_interval"] == "2021-07-01"] <- "4"
+df["quarter_interval"][df["quarter_interval"] == "2021-08-01"] <- "5"
+df["quarter_interval"][df["quarter_interval"] == "2021-09-01"] <- "6"
+df["quarter_interval"][df["quarter_interval"] == "2021-10-01"] <- "7"
+df["quarter_interval"][df["quarter_interval"] == "2021-11-01"] <- "8"
+df["quarter_interval"][df["quarter_interval"] == "2021-12-01"] <- "9"
+df["quarter_interval"][df["quarter_interval"] == "2022-01-01"] <- "10"
+df["quarter_interval"][df["quarter_interval"] == "2022-02-01"] <- "11"
+
 
 #change the format of variable
 df$quarter_interval = as.numeric(as.character(df$quarter_interval))
@@ -107,13 +116,13 @@ df$quarter_interval = as.numeric(as.character(df$quarter_interval))
 
 ```{r,fig.cap="Unemployment rate in US", echo=FALSE}
 #present the unemployment rate in US during the period
-ggplot(df, aes(x = quarter_interval, y = UNRATE, group = 1)) +
+ggplot(df, aes(x = quarter_interval, y = UnemploymentRate, group = 1)) +
   geom_point(shape=21, color="black", fill="#69b3a2", size=2) +
   geom_line( color="grey") +
   geom_vline(xintercept = 1, linetype="dotted", 
                 color = "green", size=1.5)+
-  geom_label(label = df$UNRATE, size=2)+
-  labs(x = "Time Interval(in quarter)", y = "Unemployment rate(%)", 
+  geom_label(label = df$UnemploymentRate, size=2)+
+  labs(x = "Time Interval(in month)", y = "Unemployment rate(%)", 
        title = "Unemployment rate in US")
 ```
 
@@ -124,17 +133,14 @@ ggplot(df, aes(x = quarter_interval, y = UNRATE, group = 1)) +
 s = summary(df)
 s %>%
   kbl(caption = "Summary of Data") %>%
-  kable_classic_2(full_width = F ,font_size = 4) %>%
+  kable_classic_2(full_width = F ,font_size = 6) %>%
   kable_styling(latex_options = "HOLD_position")
 ```
 
 \newpage
 # 3. Model Development
 
-```{r, fig.cap="Simple Linear Regression",echo=FALSE}
-#draw the simple linear regression line
-ggplot(df,aes(y=UNRATE,x=quarter_interval))+geom_point()+geom_smooth(formula = y ~ x, method = "lm") 
-```
+
 
 
 ```{r, echo=FALSE}
@@ -147,12 +153,17 @@ t %>%
   kable_styling(latex_options = "HOLD_position")
 ```
 
+```{r, fig.cap="Simple Linear Regression",echo=FALSE, message=FALSE, warning=FALSE}
+#develop the simple linear regression model
+simple.fit = lm(UnemploymentRate ~  ARP , data=df)
+ggplot(df,aes(y=UnemploymentRate,x= ARP))+geom_point()+geom_smooth(formula = y ~ x, method = "lm") 
+tbl_regression(simple.fit)
+```
 
-\newpage
-```{r,fig.cap="Original Multiple Regression Model", echo=FALSE}
+```{r,tab="Original Multiple Regression Model", echo=FALSE, message=FALSE}
 #build the multiple regression model
-multi.fit = lm(UNRATE ~ quarter_interval + ARP + GDPC1 + POPTHM + T10YIE + FEDFUNDS + avg_earning + workforce   , data=df)
-summ(multi.fit)
+multi.fit = lm(UnemploymentRate ~ quarter_interval + ARP  + Population + InflationRate + InterestRate + Wage + Laborforce   , data=df)
+tbl_regression(multi.fit)
 ```
 
 ```{r, fig.cap="Added-Variable Plots",echo=FALSE}
@@ -161,19 +172,22 @@ avPlots(multi.fit)
 ```
 
 
-
 ```{r, include=FALSE}
 step = stepAIC(multi.fit, direction = "both")
 step$anova 
 ```
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 #test for the model selected by stepAIC
-multi.fit1 <- lm(UNRATE ~ GDPC1 + POPTHM + workforce, data=df)
-summ(multi.fit1)
+multi.fit1 <- lm(UnemploymentRate ~ quarter_interval + InflationRate + InterestRate + 
+    Wage, data=df)
+tbl_regression(multi.fit1, intercept = TRUE)
 ```
 
+```{r, warning=FALSE,echo=FALSE, message=FALSE}
+modelsummary(list(multi.fit, multi.fit1))
+```
 
 
 # 4. Discussion and Results
@@ -195,20 +209,10 @@ summ(multi.fit1)
 \newpage
 # Appendix
 
-```{r,fig.cap="Real GDP in US", echo=FALSE}
-#present the Real GDP in US during the period
-ggplot(df, aes(x = quarter_interval, y = GDPC1, group = 1)) +
-  geom_point(shape=21, color="pink", fill="#69b3a2", size=2) +
-  geom_line( color="black") +
-  geom_vline(xintercept = 1, linetype="dotted", 
-                color = "blue", size=1.5)+
-  labs(x = "Time Interval(in quarter)", y = "real GDP", 
-       title = "Real GDP in US")
-```
 
 ```{r,fig.cap="Population in US", echo=FALSE}
 #present the population in US during the period
-ggplot(df, aes(x = quarter_interval, y = POPTHM, group = 1)) +
+ggplot(df, aes(x = quarter_interval, y = Population, group = 1)) +
   geom_point(shape=21, color="black", fill="#69b3a2", size=2) +
   geom_line( color="black") +
   geom_vline(xintercept = 1, linetype="dotted", 
@@ -219,7 +223,7 @@ ggplot(df, aes(x = quarter_interval, y = POPTHM, group = 1)) +
 
 ```{r,fig.cap="Inflation Rate in US", echo=FALSE}
 #present the inflation rate in US during the period
-ggplot(df, aes(x = quarter_interval, y = T10YIE, group = 1)) +
+ggplot(df, aes(x = quarter_interval, y = InflationRate, group = 1)) +
   geom_point(shape=21, color="black", fill="#69b3a2", size=2) +
   geom_line( color="black") +
   geom_vline(xintercept = 1, linetype="dotted", 
@@ -230,7 +234,7 @@ ggplot(df, aes(x = quarter_interval, y = T10YIE, group = 1)) +
 
 ```{r,fig.cap="Effective Federal Fund Rate in US", echo=FALSE}
 #present the effective federal fund rate in US during the period
-ggplot(df, aes(x = quarter_interval, y = FEDFUNDS, group = 1)) +
+ggplot(df, aes(x = quarter_interval, y = InterestRate, group = 1)) +
   geom_point(shape=21, color="black", fill="#69b3a2", size=2) +
   geom_line( color="black") +
   geom_vline(xintercept = 1, linetype="dotted", 
@@ -243,7 +247,7 @@ ggplot(df, aes(x = quarter_interval, y = FEDFUNDS, group = 1)) +
 
 ```{r,fig.cap="Average Earning in US", echo=FALSE}
 #present the average earning in US during the period
-ggplot(df, aes(x = quarter_interval, y = avg_earning, group = 1)) +
+ggplot(df, aes(x = quarter_interval, y = Wage, group = 1)) +
   geom_point(shape=21, color="black", fill="#69b3a2", size=2) +
   geom_line( color="black") +
   geom_vline(xintercept = 1, linetype="dotted", 
@@ -254,7 +258,7 @@ ggplot(df, aes(x = quarter_interval, y = avg_earning, group = 1)) +
 
 ```{r,fig.cap="Civilian Labor Force Level in US", echo=FALSE}
 #present the civilian labor force level in US during the period
-ggplot(df, aes(x = quarter_interval, y = workforce, group = 1)) +
+ggplot(df, aes(x = quarter_interval, y = Laborforce, group = 1)) +
   geom_point(shape=21, color="black", fill="#69b3a2", size=2) +
   geom_line( color="black") +
   geom_vline(xintercept = 1, linetype="dotted", 
@@ -271,13 +275,12 @@ ggplot(df, aes(x = quarter_interval, y = workforce, group = 1)) +
 
 ```{r, fig.cap="Normality of Unemployment Rate",echo=FALSE}
 #check for normality of dependent variable
-hist(df$UNRATE)
+hist(df$UnemploymentRate)
 ```
 
 ```{r q,fig.cap="Linearity Test for Covariates", echo=FALSE}
 #check for linearity of variables
-plot(df$UNRATE ~ ARP + GDPC1 + POPTHM + T10YIE + FEDFUNDS + avg_earning + 
-                 workforce, data=df)
+plot(df$UnemploymentRate ~ ARP  + Population + InflationRate + InterestRate + Wage +  Laborforce, data=df)
 ```
 
 ```{r, fig.cap="Homoscedasticity Tests",echo=FALSE}
