@@ -26,9 +26,7 @@ library(jtools)
 library(modelsummary)
 ```
 
-
-
-
+\newpage
 # 1.Introduction
 Since 2020, the outbreak of COVID-19 has adversely affected people's daily lives and the global economy. More than 235 000 cases of infection have occurred in the United States in less than two months since the first case was discovered in Washington on January 20, 2020. As of March 17, the outbreak had spread all over the country, including Washington, New York, and California. The number of COVID-19-related deaths in the United States has exceeded 5000 as of April 2020(@update). On December 31, 2020, there were more than 20 million infections and more than 346 thousand deaths within the United States, as well as 83,832,334 confirmed cases and 1,824,590 confirmed deaths worldwide(4). Apart from the COVID-19 pandemic, the related economic crisis in the United States has had a detrimental effect on the economic and health well-being of millions of American workers. Over 9.5 million jobs have been lost as a result of COVID-19, with 4 million workers out of work for at least six months(@ARPs).
 
@@ -36,8 +34,9 @@ Consequently, in order to stimulate and recover the economy from the foreseeable
 
 In light of the foregoing, we conducted this study to investigate whether there is a statistically significant correlation between the growth of the U.S. economy in various aspects and the implementation of ARP using a number of economic indicators from the Federal Reserve Economic Data. We examine the association in this report using a multiple regression model that incorporates covariates such as unemployment rate, population, 10-year breakeven inflation rate, federal funds effective rate, average hourly earnings, as well as civilian labour force level and a dummy variable reflecting the status of before and after the implementation of the ARP. The implementation of ARP has been shown to effectively reduce unemployment rates in simple linear regression models. Nonetheless, the data do not show a statistically significant association between the unemployment rate and the implementation of the ARP, indicating that the policy has not been effective or that the effect has not been fully exploited and demonstrated by January 2022.
 
- 
-In the remaining elements of this paper, there are three sections: a data section where the data is analyzed and examined, a model section where the regression model is developed, and a discussion section where the limitations and implications are discussed. The findings of this report will provide stakeholders with an insight into how to evaluate ARP policies and make better plans by taking into account findings.
+In the remaining elements of this paper, there are three sections: a data section where the data is analyzed and examined, a model section where the simple and multiple linear regression models are developed, and a discussion section where the limitations and implications are discussed. The findings of this report will provide stakeholders with an insight into how to evaluate ARP policies and make better plans by taking into account findings.
+
+It is evident from the simple linear analysis that the implementation of APR is associated with the decline in the unemployment rate. The unemployment rate declined by 2.8% following the introduction of the ARP, a result that is statistically significant at a significance level of 10%, but insignificant at a significance level of 5%. Nevertheless, there is no statistical evidence that the implementation of ARP reduces the unemployment rate, suggesting that it may be ineffective.
 
 To analyze the data in this report, the R statistical programming language(@R) will be applied. Moreover, the following packages must be installed in R for cleaning and analysis processes: openxlsx(@openxlsx), ggplot2(@ggplot2),kableExtra(@kableExtra), gtsummary(@gtsummary), jtools(@jtools), and modelsummary(@modelsummary).
 
