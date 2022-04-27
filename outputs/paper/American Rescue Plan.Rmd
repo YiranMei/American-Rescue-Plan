@@ -1,9 +1,9 @@
 ---
-title: "The Effectiveness of Biden's American Rescue Plan: A Multiple Linear Regression Analysis"
+title: "The Effectiveness of Biden's American Rescue Plan: Linear Regression Analysis"
 author: "Yiran Mei"
 date: "02/04/2022"
 output: pdf_document
-abstract: "COVID-19 has dominated people's daily lives across the globe since its emergence at the beginning of 2020. In order to combat the adverse effects of the recession on the United States economy, President Biden announced and signed the American Rescue Plan (ARP) to stimulate the market. The purpose of this study is to investigate the impact of the plan's implementation on a number of economic indicators such as the unemployment rate and inflation rate using a multiple regression model. Additionally, statistical techniques such as regression analysis, correlation analysis, and ANOVA are applied to analyze the regression model's results. We estimate that the ARP has no statistical significance with respect to these economic indicators based on our regression model. Statistical analysis of data and evaluation of statistical results will be conducted using the R statistical programming language, version 4.1.2."
+abstract: "COVID-19 has dominated people's daily lives across the globe since its emergence at the beginning of 2020. In order to combat the adverse effects of the recession on the United States economy, President Biden announced and signed the American Rescue Plan (ARP) to stimulate the market. The purpose of this study is to investigate the impact of the plan's implementation on a number of economic indicators such as the unemployment rate and inflation rate using simple linear regression and a multiple regression model. Additionally, statistical techniques such as regression analysis and correlation analysis are applied to analyze the regression model's results. We estimate that the ARP is effective in reducing the unemployment rate in the simple linear regression model but has no statistical significance with respect to these economic indicators based on our multiple regression model. Statistical analysis of data and evaluation of statistical results will be conducted using the R statistical programming language, version 4.1.2."
 thanks: 'Code and data are available at: https://github.com/YiranMei/American-Rescue-Plan.'
 bibliography: ref_list.bib
 toc: TRUE
@@ -11,46 +11,54 @@ toc: TRUE
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=8, fig.height=6) 
 #install.packages("kableExtra")
 #install.packages("ggplot2")
 #install.packages("gtsummary")
 #install.packages("openxlsx")
 #install.packages("jtools")
-#install.packages("MASS")
-#install.packages("car")
 #install.packages("modelsummary")
 library(kableExtra)
 library(ggplot2)
 library(gtsummary)
 library(openxlsx)
 library(jtools)
-library(MASS)
-library(car)
 library(modelsummary)
 ```
+
+
+
 
 # 1.Introduction
 Since 2020, the outbreak of COVID-19 has adversely affected people's daily lives and the global economy. More than 235 000 cases of infection have occurred in the United States in less than two months since the first case was discovered in Washington on January 20, 2020. As of March 17, the outbreak had spread all over the country, including Washington, New York, and California. The number of COVID-19-related deaths in the United States has exceeded 5000 as of April 2020(@update). On December 31, 2020, there were more than 20 million infections and more than 346 thousand deaths within the United States, as well as 83,832,334 confirmed cases and 1,824,590 confirmed deaths worldwide(4). Apart from the COVID-19 pandemic, the related economic crisis in the United States has had a detrimental effect on the economic and health well-being of millions of American workers. Over 9.5 million jobs have been lost as a result of COVID-19, with 4 million workers out of work for at least six months(@ARPs).
 
 Consequently, in order to stimulate and recover the economy from the foreseeable recession, Biden and the government announced the American Rescue Plan (ARP) on March 11, 2021, under which approximately $1 trillion in total would be allocated directly to the American people(@ARPs). Along with extending PUA (Pandemic Unemployment Assistance) through September 6, 2006(@ARPl), each worker can receive a lump-sum payment of $1400 and weekly benefits of $300. A number of provisions were included in the proposed plan, including an extension of unemployment compensation, an increase in the Child Tax Credit, funding for state and local governments, and a subsidy for extra medical expenses resulting from COVID-19(@benefit). At this point of reopening and reflecting on the past two years, an examination of the effectiveness of the ARP becomes necessary to assess whether it has boosted the economy.
 
-In light of the foregoing, we conducted this study to investigate whether there is a statistically significant correlation between the growth of the U.S. economy in various aspects and the implementation of ARP using a number of economic indicators from the Federal Reserve Economic Data. We examine the association in this report using a multiple regression model that incorporates covariates such as unemployment rate, real Gross Domestic Product(GDP), population, 10-year breakeven inflation rate, federal funds effective rate, average hourly earnings, as well as civilian labour force level and a dummy variable reflecting the status of before and after the implementation of the ARP. It has been shown that there is no statistical significance in the association between real GDP and the implementation of the ARP, which suggests the policy has been ineffective. 
+In light of the foregoing, we conducted this study to investigate whether there is a statistically significant correlation between the growth of the U.S. economy in various aspects and the implementation of ARP using a number of economic indicators from the Federal Reserve Economic Data. We examine the association in this report using a multiple regression model that incorporates covariates such as unemployment rate, population, 10-year breakeven inflation rate, federal funds effective rate, average hourly earnings, as well as civilian labour force level and a dummy variable reflecting the status of before and after the implementation of the ARP. The implementation of ARP has been shown to effectively reduce unemployment rates in simple linear regression models. Nonetheless, the data do not show a statistically significant association between the unemployment rate and the implementation of the ARP, indicating that the policy has not been effective or that the effect has not been fully exploited and demonstrated by January 2022.
+
  
-In the remaining elements of this paper, there are four sections: a data section where the data is analyzed and examined, a model section where the regression model is developed, a result section explaining the results, and a discussion section where the limitations and implications are discussed. The findings of this report will provide stakeholders with an insight into how to evaluate ARP policies and make better plans by taking into account findings.
+In the remaining elements of this paper, there are three sections: a data section where the data is analyzed and examined, a model section where the regression model is developed, and a discussion section where the limitations and implications are discussed. The findings of this report will provide stakeholders with an insight into how to evaluate ARP policies and make better plans by taking into account findings.
 
-To analyze the data in this report, the R statistical programming language(@R) will be applied. Moreover, the following packages must be installed in R for cleaning and analysis processes: openxlsx(@openxlsx), ggplot2(@ggplot2),kableExtra(@kableExtra), gtsummary(@gtsummary), jtools(@jtools), MASS(@MASS) and car(@car).
+To analyze the data in this report, the R statistical programming language(@R) will be applied. Moreover, the following packages must be installed in R for cleaning and analysis processes: openxlsx(@openxlsx), ggplot2(@ggplot2),kableExtra(@kableExtra), gtsummary(@gtsummary), jtools(@jtools), and modelsummary(@modelsummary).
 
-\newpage
 
 # 2. Data
 
 ## 2.1 Data Source
+
 ```{r, echo=FALSE}
 df <- read.xlsx("/Users/winifredmei/Desktop/fredgraph.xlsx")
 df <- df[-c(0:12), ]
 colnames(df) <- df[1,]
 df <- df[-1, ]
 ```
+
+All data are from the website of FRED, which refers to the Federal Reserve Economic Data. The database is created and maintained by Research Department at the Federal Reserve Bank of St. Louis and contains economic data time series from a range of national, international, public, and private sources. The data were collected and updated by the Federal Reserve on a daily basis.
+The website tools enables user to combine multiple economic indicators on a single graph/files, and a dataset in excel format is therefore downloaded from the website and imported into R studio directly.
+
+## 2.2 Data Characteristics
+
+There are nine variables in total on the dataset. The date, unemployment rate, population, 10-year breakeven inflation rate, federal funds effective rate, average hourly earnings, as well as civilian labour force level are from the original dataset downloaded, and the dummy variable reflecting the status of before and after the implementation of the ARP is created through R Markdown. The date is transformed into the time interval collapsed on the date of implementation of the ARP as well to develop the model.
 
 
 ```{r, include=FALSE}
@@ -72,147 +80,155 @@ df$Laborforce = as.numeric(as.character(df$Laborforce))
 #add dummy variable of ARP
 ARP <- c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1)
 df <- cbind(df, ARP)
-```
-
-```{r, include=FALSE}
 
 #change the date variable to interval collapsed on the implementation of ARP
-names(df)[names(df) == "observation_date"] <- "quarter_interval"
+quarter <- c(-14, -13, -12, -11, -10, -9, -8,-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+df <- cbind(quarter, df)
 
-df["quarter_interval"][df["quarter_interval"] == "2020-01-01"] <- "-14"
-df["quarter_interval"][df["quarter_interval"] == "2020-02-01"] <- "-13"
-df["quarter_interval"][df["quarter_interval"] == "2020-03-01"] <- "-12"
-df["quarter_interval"][df["quarter_interval"] == "2020-04-01"] <- "-11"
-df["quarter_interval"][df["quarter_interval"] == "2020-05-01"] <- "-10"
-df["quarter_interval"][df["quarter_interval"] == "2020-06-01"] <- "-9"
-df["quarter_interval"][df["quarter_interval"] == "2020-07-01"] <- "-8"
-df["quarter_interval"][df["quarter_interval"] == "2020-08-01"] <- "-7"
-df["quarter_interval"][df["quarter_interval"] == "2020-09-01"] <- "-6"
-df["quarter_interval"][df["quarter_interval"] == "2020-10-01"] <- "-5"
-df["quarter_interval"][df["quarter_interval"] == "2020-11-01"] <- "-4"
-df["quarter_interval"][df["quarter_interval"] == "2020-12-01"] <- "-3"
-df["quarter_interval"][df["quarter_interval"] == "2021-01-01"] <- "-2"
-df["quarter_interval"][df["quarter_interval"] == "2021-02-01"] <- "-1"
-df["quarter_interval"][df["quarter_interval"] == "2021-03-01"] <- "0"
-df["quarter_interval"][df["quarter_interval"] == "2021-04-01"] <- "1"
-df["quarter_interval"][df["quarter_interval"] == "2021-05-01"] <- "2"
-df["quarter_interval"][df["quarter_interval"] == "2021-06-01"] <- "3"
-df["quarter_interval"][df["quarter_interval"] == "2021-07-01"] <- "4"
-df["quarter_interval"][df["quarter_interval"] == "2021-08-01"] <- "5"
-df["quarter_interval"][df["quarter_interval"] == "2021-09-01"] <- "6"
-df["quarter_interval"][df["quarter_interval"] == "2021-10-01"] <- "7"
-df["quarter_interval"][df["quarter_interval"] == "2021-11-01"] <- "8"
-df["quarter_interval"][df["quarter_interval"] == "2021-12-01"] <- "9"
-df["quarter_interval"][df["quarter_interval"] == "2022-01-01"] <- "10"
-df["quarter_interval"][df["quarter_interval"] == "2022-02-01"] <- "11"
+dataset <- subset(df, select = -c(observation_date))
 
-
-#change the format of variable
-df$quarter_interval = as.numeric(as.character(df$quarter_interval))
 ```
 
-## 2.2 Data Characteristics
-
-
-```{r,fig.cap="Unemployment rate in US", echo=FALSE}
+```{r,fig.cap="Unemployment rate in US", fig.height = 3, fig.width = 6, fig.align = "center", echo=FALSE}
 #present the unemployment rate in US during the period
-ggplot(df, aes(x = quarter_interval, y = UnemploymentRate, group = 1)) +
+ggplot(dataset, aes(x = quarter, y = UnemploymentRate, group = 1)) +
   geom_point(shape=21, color="black", fill="#69b3a2", size=2) +
   geom_line( color="grey") +
   geom_vline(xintercept = 1, linetype="dotted", 
                 color = "green", size=1.5)+
-  geom_label(label = df$UnemploymentRate, size=2)+
+  geom_label(label = dataset$UnemploymentRate, size=2)+
   labs(x = "Time Interval(in month)", y = "Unemployment rate(%)", 
-       title = "Unemployment rate in US")
+       title = "Unemployment rate in US") 
 ```
+The unemployment rate, which would be the variable of interest in the model, is calculated by dividing the number of unemployed by the number of employed and achieved through the collection of labor force data. It can be seen in Figure 1 that the unemployment rate increase considerably before period -9(2020-06-01), and then rocketed to 14.7%. This may be due to the widespread outbreak of COVID-19 after March 2020. Afterwards, the unemployment rate dropped to 8.83% and then to 5.9% prior to the implementation of the ARP. It is evident that after the implementation of the ARP, the rate is decreasing continuously. The dummy variable of the implementation of ARP is equal to zero if the quarter precedes the ARP and equal to one if the quarter follows.
 
+There are five control covariates in total. The population includes both local residents and armed forces overseas. For inflation rate, we used the breakeven inflation rate which measures the expected inflation rate derived from 10-Year Treasury Constant Maturity Securities. The latest value implies what market participants expect inflation to be in the next 10 years, on average. Additionally, the federal funds rate was used as an interest rate. Basically, it is the overnight rate that depository institutions within the United States use to trade the excess reserves of federal funds with other banks, which is determined by the market, but also monitored by the Federal Reserve as a target rate. Including overtime and late shift payments, the average hourly earnings of all private employees is an indicator of the average hourly earnings of all private employees on a "gross" basis. Benefits, irregular bonuses, retroactive pay, and the employer's payroll taxes are not included in this measure. The civilian labor force level is restricted to adults aged 16 and older who reside in a state or the District of Columbia, who are not confined to institutions (such as prisons, mental institutions, or retirement homes for the elderly), and who are not on active duty in the armed forces. These data are derived from the Current Population Survey (Household Survey).
 
+An overview of all variables is provided in Table 1, which indicates the scale and range of each variable.
 
 ```{r, echo=FALSE}
 #show a numeric summary of the data
-s = summary(df)
+s = summary(dataset)
 s %>%
   kbl(caption = "Summary of Data") %>%
   kable_classic_2(full_width = F ,font_size = 6) %>%
   kable_styling(latex_options = "HOLD_position")
 ```
+The graphs showing the trend of those covariates over the study period are included in Appendix.A. According to Figure 3, the population of the United States has shown an overall increasing trend throughout the period. During periods -4 and -2, it decreased rapidly before increasing slightly. It surged after period 1, reaching more than 332,000,000. During the period illustrated in Figure 4, the inflation rate in the United States fluctuates substantially. For example, it significantly decreased between periods -14 and -12. However, the trend began to accelerate after that, until the period -7. The next increasing period of it occurred between periods -4 and 2 and began to decline one month after the implementation of ARP.  According to Figure 5, the effective federal fund rate indicates a stable trend following a decline between periods -13 and -11. Following this decline, the rate remained within the range of 0.7 and 0.9. Figure 6 demonstrates that the average earning in the US increased from period -12 to period -11, reaching $30/hr. Following the jump, the average earning rises steadily over time and exceeds $31 in period 7. A fluctuating trend can also be observed in the civilian labor force in the US, as shown in Figure 7. However, after a significant drop and growth from period -13 to period -9, it fluctuates around 161 million, and has continued to rise since the introduction of ARP in period 1, reaching 162.5 million by the end of period 9.
 
-\newpage
-# 3. Model Development
+# 3. Model
 
+The purpose of this subsection is to examine the relationship between observed economic characteristics; the time collapse on the implementation date and the unemployment rate in the United States, using a regression framework. This analysis entails several steps.
 
+## 3.1 Model Assumption Tests
 
+To begin with, we need to check if our data meet the four main assumptions for the regression. 
 
+Table 2 displays the correlation matrix as a test of the independence of observations. It is evident that none of the correlations display extremely high values, apart from the correlation between the quarter and population and wage. Due to the fact that the quarter is merely a time variable, we can disregard it. Second, we perform a histogram of the dependent variable in order to determine whether it is normal in Figure 8. In light of the small sample size and the presence of an outlier, it is understandable that the histogram of unemployment shows a positive skewness rather than a normal distribution, which violates the assumption. Violating the assumption of normality has few consequences, as it does not result in any bias or inefficiency in the regression model. P values are only affected if the assumption is violated. Following this, we test each covariate for linearity on the time interval. As can be seen from the figures in Appendix.C, the majority of covariates have a linear relationship with the variable of interest except for a few outliers except the dummy variable ARP. For the Homoscedasticity Assumption Test, we would do it after performing the regression.
 ```{r, echo=FALSE}
 #check for the independence of observations
-res <- cor(df)
+res <- cor(dataset)
 t <- round(res, 2)
 t %>%
   kbl(caption = "Correlation Matrix of Variables") %>%
   kable_classic(full_width = F, html_font = "Cambria",font_size = 8) %>%
   kable_styling(latex_options = "HOLD_position")
 ```
+## 3.2 Model Development 
 
-```{r, fig.cap="Simple Linear Regression",echo=FALSE, message=FALSE, warning=FALSE}
+### 3.2.1 Simple Linear Model
+
+Having completed the tests, we will attempt to construct a simple linear regression in which the dummy variable ARP serves as the running variable and the unemployment rate is the outcome of interest,
+
+***$Y_i$= $\beta$ $D_i$ + $\mu_i$ ***, 
+
+where the dummy variable Di is equal to zero if the quarter precedes the ARP and equal to one if the quarter follows, while $\mu_i$ represents the error term. The $\beta$ indicates the coefficient of the treatment variable, ARP on the outcome variable.
+```{r,echo=FALSE, message=FALSE, warning=FALSE}
 #develop the simple linear regression model
-simple.fit = lm(UnemploymentRate ~  ARP , data=df)
-ggplot(df,aes(y=UnemploymentRate,x= ARP))+geom_point()+geom_smooth(formula = y ~ x, method = "lm") 
-tbl_regression(simple.fit)
+simple.fit = lm(UnemploymentRate ~  ARP , data=dataset)
 ```
 
-```{r,tab="Original Multiple Regression Model", echo=FALSE, message=FALSE}
-#build the multiple regression model
-multi.fit = lm(UnemploymentRate ~ quarter_interval + ARP  + Population + InflationRate + InterestRate + Wage + Laborforce   , data=df)
-tbl_regression(multi.fit)
-```
+### 3.2.2 Multiple Linear Model with All Covariates
 
-```{r, fig.cap="Added-Variable Plots",echo=FALSE}
-#check for variables added
-avPlots(multi.fit)
-```
+Consequently, we attempt to build multiple linear regression models for the central equation in order to make a better fit. In essence, the equation is as follows:
 
+***$Y_i$= $\beta$ $D_i$ + f($t_i$-t’)+$\beta_i$ $X_i$ + $\mu_i$ ***, 
 
-```{r, include=FALSE}
-step = stepAIC(multi.fit, direction = "both")
-step$anova 
-```
-
+taking $t_i$ as the calendar date, and t’ as the date on which the ARP was implemented, f($t_i$-t’) serves as a running variable that represents the relationship between the collapsed date and the outcome of interest. The dummy variable Di is equal to zero if the quarter precedes the ARP and equal to one if the quarter follows.For bias reduction, we add Xi representing other covariates stated before, while $\mu_i$ represents the error term.The $\beta$ indicates the coefficient of the treatment variable, ARP on the outcome variable while the $\beta_i$ represents the coefficients of all covariates. We build the model with all of the covariates discussed before in this report.
 
 ```{r, echo=FALSE, message=FALSE}
-#test for the model selected by stepAIC
-multi.fit1 <- lm(UnemploymentRate ~ quarter_interval + InflationRate + InterestRate + 
-    Wage, data=df)
-tbl_regression(multi.fit1, intercept = TRUE)
+#build the multiple regression model
+multi.fit = lm(UnemploymentRate ~ quarter + ARP  + Population + InflationRate + InterestRate + Wage + Laborforce   , data=dataset)
+```
+# 4. Results
+
+## 4.1 Models Summary
+
+### 4.1.1 Simple Linear Regression Model
+
+According to Figure 2, the regression line of the simple regression model does not fit well with the plots since there are no observations between ARP equals zero and one. The coefficient of the simple linear model shown in Table 3 tells that the on average,  the unemployment rate became 2.8% lower after the introduction of the ARP, and the result is statistically significant at a 10% significance level but insignificant at 5%. Therefore, the data is evidently sufficient to reject the null hypothesis of the regression and indicating there is a non-zero correlation, which suggests the changes in the independent variable are associated with the changes in the dependent variable at the population level at a significance level of 10%. That is, the implementation of ARP is associated with the reduction of the unemployment rate.
+```{r, fig.keep='all', fig.align= 'center', fig.cap="Simple Linear Regression", echo=FALSE, message=FALSE, warning=FALSE, fig.pos='h'}
+#plot the simple linear regression line
+ggplot(dataset,aes(y=UnemploymentRate,x= ARP))+geom_point()+geom_smooth(formula = y ~ x, method = "lm") 
 ```
 
-```{r, warning=FALSE,echo=FALSE, message=FALSE}
-modelsummary(list(multi.fit, multi.fit1))
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#display the summary of the simple linear regression model
+simple = tbl_regression(simple.fit) 
+k.simple=as_kable_extra(simple, caption = "Summary of Simple Linear Regression")
+k.simple%>%kable_styling(latex_options = "HOLD_position")
 ```
 
+### 4.1.2 Multiple Linear Regression Model
 
-# 4. Discussion and Results
+After performing the multiple linear regression, we examine the regression analysis using the regression summary. In the Table 4, it shows that the coefficient of the variable ARP is 0.37, which suggests a positive relationship with the implementation of the ARP and the unemployment rate. However, this result is not statistically significant as the P-value is 0.6, which is a considerably large value. It implies that there is no sufficient evidence to reject the null hypothesis and find a non-zero correlation. That is, there is no statistical evidence that the implementation of ARP is associated with the reduction of unemployment rate. Moreover, we can see that only two covariates, interest rate and wage variables, produce statistical significant outcomes with a significance level of 5% and 10%. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#display the summary of the simple linear regression model
+multi = tbl_regression(multi.fit) 
+k.multi=as_kable_extra(multi, caption = "Summary of Multiple Linear Regression")
+k.multi%>%kable_styling(latex_options = "HOLD_position")
+```
+## 4.2 Comparisons of Two Models
+
+From the comparison summary of two models in Table 5, the R-Squared of simple  linear regression model is merely 0.2442, which suggests only 24.42% of the variability observed in the unemployment rate is explained by the regression model. The  r-squared of the multiple linear regression model is 0.9497624, which indicates that approximately 94.97% of the data fit the regression model. On the other hand, the standard error of the ARP treatment variable in the multiple linear regression model is also smaller than the simple linear regression model. This suggests a more precise prediction of the multiple linear regression model as well. 
+```{r, echo=FALSE, message=FALSE}
+#compare two models outcomes
+modelsummary(list(simple.fit, multi.fit), output = "kableExtra", caption = "Comparison of Models")%>%kable_styling(latex_options = "HOLD_position")
+```
+
+## 4.3 Homoscedasticity Assumption Test
+
+### 4.3.1 Simple Linear Regression Model
+
+Based on the figures in Appendix.D, the "Residuals vs. Fitted" plot clearly indicates an increase in variance in the fitted values. For fitted values below 5, residuals range from -2 to 2. Alternatively, for larger fitted values beyond 7.5, the difference between residuals is greater. The presence of heteroscedasticity is evident from this observation. On the "Scale-Location"-plot, an increase in the square root of the standardized residuals can be observed across the fitted values. Thus, we can conclude, using both the "Residuals versus Fitted" and the "Scale-Location" plots, that a simple linear regression model does not satisfy the homoscedasticity assumption.
+
+### 4.3.2 Multiple Linear Regression Model with All Covariates
+
+Images from Appendix.E are used to perform the homoscedasticity assumption test for multiple linear regression. Observe that both the "Residual vs. Fitted" and the "Scales-Location" plots are devoid of heteroscedastic residuals. Despite the fact that the lines in these two plots do not appear to be flat, the residuals show a relatively stable variability that is unaffected by the fitted values. Consequently, the multiple linear regression model does not violate the assumption of homoscedasticity.
 
 
-## 4.1 Results
+# 5. Discussion
 
+## 5.1 Discussion and Implications 
 
+In the two models we developed for this report, the first ignores all other factors that affect the unemployment rate and directly concludes that its implementation led to a reduction. Unfortunately, incomplete data and a limited time frame distort the efficiency of the model itself, which decreases the degree of credibility of the results. In general, based upon the analysis of the models presented in this report, we may only accept the multiple linear regression model. Unexpectedly, this model suggests that the unemployment rate actually increases due to the introduction, but the association is not statistically significant. There is a greater likelihood that the decline in unemployment rate is related to changes in interest rates and wages. 
+Nevertheless, the change in the interest rate and wage may not be independent of the introduction of ARP. COVID-19 definitely results in a monetary shock on the market, resulting in a decrease in the asset market(@shock). Consequently, in order to achieve full employment, the U.S. government carries out a temporary expansionary fiscal policy which includes the ARP in order to increase government spending and, subsequently, raise aggregate demand and, therefore, the level of production(@fiscal). Both interest rates and exchange rates will be impacted by the rising demand for money. As a price in the labor market, wages are also implicated in macroeconomic changes as a whole.Accordingly, the effect of the ARP may be transmitted to the unemployment rate through other mediums, such as the change in interest rate, wage and some other omitted variables in the report. The fact is that we do indeed witness a reduction in unemployment in the United States following the implementation of this policy, but the rationale behind it in the overall economic system is far more complicated than the policy itself. Due to this, we cannot draw an arbitrary conclusion that the ARP is completely ineffective at boosting employment and the economy. More analysis and consideration of numerous economic indicators should be completed and combined in order to render a conclusive and comprehensive assessment of the ARP policy.
 
-## 4.2 Discussion
+## 5.2 Ethics and biases 
 
-### 4.2.1 General Findings
-
-
-### 4.2.2 Implications
-### 4.2.3 Ethics and biases
-
+The primary drawback of this research and model is that the data is insufficient to support a reliable and sound conclusion. Since the policy was conducted only a short while ago, there is not enough time for us to collect enough information to predict an accurate statistic. Our model can only be built using 26 periods of data with incomplete distributions. Future data will be needed in order to analyze the policy's long-term effectiveness.
+Secondly, the factors influencing the unemployment rate may be more extensive than those cited in this report. Consequently, an omitted variable bias may be present. In the absence of accounting for relevant independent variables, the coefficient of the variables in the model is likely to be biased and inaccurate. The economy as a whole involves a large number of factors that influence the rate of unemployment and policy in conjunction, and some of these factors may be unknown or unquantifiable.
+For future research, it would be beneficial to develop a model with more precise and abundant data in order to eliminate the basis described above.
 
 \newpage
 # Appendix
 
+## Appendix.A 
 
 ```{r,fig.cap="Population in US", echo=FALSE}
 #present the population in US during the period
-ggplot(df, aes(x = quarter_interval, y = Population, group = 1)) +
+ggplot(dataset, aes(x = quarter, y = Population, group = 1)) +
   geom_point(shape=21, color="black", fill="#69b3a2", size=2) +
   geom_line( color="black") +
   geom_vline(xintercept = 1, linetype="dotted", 
@@ -223,23 +239,23 @@ ggplot(df, aes(x = quarter_interval, y = Population, group = 1)) +
 
 ```{r,fig.cap="Inflation Rate in US", echo=FALSE}
 #present the inflation rate in US during the period
-ggplot(df, aes(x = quarter_interval, y = InflationRate, group = 1)) +
+ggplot(dataset, aes(x = quarter, y = InflationRate, group = 1)) +
   geom_point(shape=21, color="black", fill="#69b3a2", size=2) +
   geom_line( color="black") +
   geom_vline(xintercept = 1, linetype="dotted", 
                 color = "blue", size=1.5)+
-  labs(x = "Time Interval(in quarter)", y = "inflation rate", 
+  labs(x = "Time Interval(in quarter)", y = "inflation rate(%)", 
        title = "Inflation Rate in US")
 ```
 
 ```{r,fig.cap="Effective Federal Fund Rate in US", echo=FALSE}
 #present the effective federal fund rate in US during the period
-ggplot(df, aes(x = quarter_interval, y = InterestRate, group = 1)) +
+ggplot(dataset, aes(x = quarter, y = InterestRate, group = 1)) +
   geom_point(shape=21, color="black", fill="#69b3a2", size=2) +
   geom_line( color="black") +
   geom_vline(xintercept = 1, linetype="dotted", 
                 color = "blue", size=1.5)+
-  labs(x = "Time Interval(in quarter)", y = "effective federal fund rate", 
+  labs(x = "Time Interval(in quarter)", y = "effective federal fund rate(%)", 
        title = "Effective Federal Fund Rate in US")
 ```
 
@@ -247,18 +263,18 @@ ggplot(df, aes(x = quarter_interval, y = InterestRate, group = 1)) +
 
 ```{r,fig.cap="Average Earning in US", echo=FALSE}
 #present the average earning in US during the period
-ggplot(df, aes(x = quarter_interval, y = Wage, group = 1)) +
+ggplot(dataset, aes(x = quarter, y = Wage, group = 1)) +
   geom_point(shape=21, color="black", fill="#69b3a2", size=2) +
   geom_line( color="black") +
   geom_vline(xintercept = 1, linetype="dotted", 
                 color = "blue", size=1.5)+
-  labs(x = "Time Interval(in quarter)", y = "average earning", 
+  labs(x = "Time Interval(in quarter)", y = "average earning($/hr)", 
        title = "Average Earning in US")
 ```
 
 ```{r,fig.cap="Civilian Labor Force Level in US", echo=FALSE}
 #present the civilian labor force level in US during the period
-ggplot(df, aes(x = quarter_interval, y = Laborforce, group = 1)) +
+ggplot(dataset, aes(x = quarter, y = Laborforce, group = 1)) +
   geom_point(shape=21, color="black", fill="#69b3a2", size=2) +
   geom_line( color="black") +
   geom_vline(xintercept = 1, linetype="dotted", 
@@ -267,24 +283,35 @@ ggplot(df, aes(x = quarter_interval, y = Laborforce, group = 1)) +
        title = "Civilian Labor Force Level in US") 
 ```
 
+\newpage
+## Appendix.B
 
-
-
-
-
-
-```{r, fig.cap="Normality of Unemployment Rate",echo=FALSE}
+```{r, fig.cap="Normality of Unemployment Rate",echo=FALSE,fig.height = 3, fig.width = 6, fig.align = "center", message=FALSE, warning=FALSE}
 #check for normality of dependent variable
-hist(df$UnemploymentRate)
+ggplot(dataset, aes(x=UnemploymentRate))+
+  geom_histogram(color="darkblue", fill="lightblue")+
+  labs(title="Unemployment Rate histogram plot",x="Unemployment Rate)", y = "Count")+
+  theme_classic()
 ```
 
-```{r q,fig.cap="Linearity Test for Covariates", echo=FALSE}
+## Appendix.C
+
+```{r, echo=FALSE}
 #check for linearity of variables
-plot(df$UnemploymentRate ~ ARP  + Population + InflationRate + InterestRate + Wage +  Laborforce, data=df)
+plot(dataset$UnemploymentRate ~ ARP  + Population + InflationRate + InterestRate + Wage +  Laborforce, data=dataset, main="Linearity Test for Covariates")
 ```
+
+## Appendix.D
 
 ```{r, fig.cap="Homoscedasticity Tests",echo=FALSE}
-#check for homoscedasticity
+#check for homoscedasticity for simple linear regression model
+plot(simple.fit)
+```
+
+## Appendix.E
+
+```{r, fig.cap="Homoscedasticity Tests",echo=FALSE}
+#check for homoscedasticity for multiple linear regression model
 plot(multi.fit)
 ```
 
