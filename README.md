@@ -1,34 +1,29 @@
-# Indonesia-Demographic-and-Health-Survey-1997
+# The Effectiveness of Biden’s American Rescue Plan: Linear Regression Analysis
 
-This report aims to analyze the birth interval results by background characteristics derived from the Indonesia Demographic and Health Survey 1997 (IDHS) conducted by the Central Bureau of Statistics and DHS (Demographic and Health Survey), and the disparities in the birth interval by age group, gender, and the survival of a prior birth, as well as by region/residence, education level and work status using R.
+This report aims to investigate whether there is a statistically significant correlation between the growth of the U.S. economy in various aspects and the implementation of ARP using a number of economic indicators from the Federal Reserve Economic Data using R.
 
-The rest of paper is composed of three parts: a data section that provides extensive information about the source data and methodology of the survey; a result section that presents the visualization of the data extracted from the report and analyzes the results; and a discussion section that discusses the limitations and implications.
+The paper is composed of the following sections: an introduction, a data section where the data is analyzed and examined, a model section where the regression model is developed, and a discussion section where the limitations and implications are assessed. The findings of this report will provide stakeholders with an insight into how to evaluate ARP policies and make better plans by taking into account findings.
 
-The results show that shorter intervals of birth are more likely to be found in young females, those with deceased prior children, and those with higher levels of education, whereas work status and gender of prior children are not significant factors. The findings of this study are expected to assist the Indonesian government in assessing the preliminary success of the "mother-friendly movement" program and setting strategic goals for its future.
+It is evident from the simple linear analysis that the implementation of APR is associated with the decline in the unemployment rate. The unemployment rate declined by 2.8% following the introduction of the ARP, a result that is statistically significant at a significance level of 10%, but insignificant at a significance level of 5%. Nevertheless, there is no statistical evidence that the implementation of ARP reduces the unemployment rate, suggesting that it may be ineffective.
 
-The final report can be viewed [here](https://github.com/chle1999/Indonesia-Demographic-and-Health-Survey-1997/blob/main/outputs/paper/paper.pdf).
+The final report can be viewed [here](https://github.com/YiranMei/American-Rescue-Plan).
 
 ## R Packages
 
 In order to process the data and analysis, the following packages should be installed:
 
-1. janitor()
-2. pdftools()
-3. purrr()
-4. tidyverse() 
-5. stringi()
-6. kableExtra()
-7. here()
-8. readr()
-9. knitr()
-10. tinytex()
+1.kableExtra()
+2.ggplot2()
+4.openxlsx()
+5.jtools()
+6.modelsummary()
 
 
 
 ## File Structure
 
-The raw data are extracted from the report of IDHS 1998 pdf file downloaded from the DHS website, which is contained in the “input” folder.
+All data are downloaded from the website of FRED, which refers to the Federal Reserve Economic Data, which is contained in the “input” folder.
+
+Additionally, all related literature is kept in the "input" folder.
 
 The "output" folder contains the original R Markdown file containing the analysis carried out in R, a PDF version of the final paper, and the reference list.
-
-The pictures of the original tables from the report is included in the “image” folder.
