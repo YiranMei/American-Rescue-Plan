@@ -373,10 +373,9 @@ Does the dataset identify any subpopulations (e.g., by age, gender)? If so, plea
 Does the dataset contain data that might be considered sensitive in any way (e.g., data that reveals race or ethnic origins, sexual orientations, religious beliefs, political opinions or union memberships, or locations; financial or health data; biometric or genetic data; forms of government identification, such as social security numbers; criminal history)? If so, please provide a description.
 -No.
 
-Any other comments?
+Any other comments?-No.
 
-		
-###F.3 Collection Process
+### F.3 Collection Process
 
 How was the data associated with each instance acquired? Was the data directly observable (e.g., raw text, movie ratings), reported by subjects (e.g., survey responses), or indirectly inferred/derived from other data (e.g., part-of-speech tags, model-based guesses for age or language)? If the data was reported by subjects or indirectly inferred/derived from other data, was the data validated/verified? If so, please describe how.
 -The data was collected, gathered and calculated by the FRED from several credible economic data providers.
