@@ -314,7 +314,7 @@ plot(simple.fit)
 plot(multi.fit)
 ```
 
-## Appendix.F
+## Appendix.F Datasheet
 
 ### F.1 Motivation
 
